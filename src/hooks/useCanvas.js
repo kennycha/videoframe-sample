@@ -27,6 +27,9 @@ export const useCanvas = ({ recordedUrl, playingVideoRef }) => {
         setTimeout(computeFrame, 33);
       }
       playingVideo.addEventListener('play', computeFrame);
+      // 녹화한 영상 데이터 로드 후 타임라인에 그릴 때까지 걸리는 시간은 loadstart / ended 로 핸들
+      // playingVideo.addEventListener('loadstart', () => console.log('loadstart'));
+      // playingVideo.addEventListener('ended', () => console.log('loadend'));
     }
     return () => {
       setFrames([]);

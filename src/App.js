@@ -10,11 +10,6 @@ const Video = styled.video`
   height: 400px;
 `
 
-const Canvas = styled.canvas`
-  width: 600px;
-  height: 400px;
-`
-
 const ButtonContainer = styled.div`
   width: 100%;
   height: 50px;
@@ -27,7 +22,7 @@ const Button = styled.button`
 
 const ImgBoxContainer = styled.div`
   width: 100%;
-  height: 400px;
+  height: 200px;
   display: flex;
   justify-content: flex-start;
   align-items: stretch;
@@ -38,15 +33,21 @@ const ImgBox = styled.img`
   width: 30px;
   height: 100%;
   object-fit: fill;
+  cursor: pointer;
+`
+
+const PreviewBox = styled.img`
+  width: 900px;
+  height: 600px;
 `
 
 
 function App() {
   const [recordedUrl, setRecordedUrl] = useState(undefined);
   const [recorder, setRecorder] = useState(undefined);
+  const [previewImage, setPreviewImage] = useState(undefined);
   const recordingVideoRef = useRef();
   const playingVideoRef = useRef();
-  const preveiewCanvasRef = useRef();
 
   useWebcam({ setRecordedUrl, setRecorder, recordingVideoRef });
 
@@ -60,6 +61,10 @@ function App() {
   const {
     frames, images
   } = useCanvas({ recordedUrl, playingVideoRef });
+
+  const handleSelectImage = (event) => {
+    setPreviewImage(event.target.src);
+  };
 
   useEffect(() => {
     console.log('frames: ', frames);
@@ -86,11 +91,13 @@ function App() {
         <Button onClick={!recordedUrl ? undefined : handleExportFrames}>Export</Button>
       </ButtonContainer>
       {!_.isEmpty(images) && (
+        <PreviewBox src={previewImage ?? images[0]} />
+      )}
+      {!_.isEmpty(images) && (
         <ImgBoxContainer>
-          {_.map(images, (image, idx) => <ImgBox src={image} key={idx} alt="frame" draggable={false} />)}
+          {_.map(images, (image, idx) => <ImgBox src={image} key={idx} alt="frame" draggable={false} onClick={handleSelectImage} />)}
         </ImgBoxContainer>
       )}
-      {!_.isEmpty(images) && <Canvas ref={preveiewCanvasRef} />}
     </>
   );
 }
