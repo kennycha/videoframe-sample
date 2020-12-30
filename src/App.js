@@ -27,7 +27,7 @@ const Button = styled.button`
 
 const ImgBoxContainer = styled.div`
   width: 100%;
-  height: 200px;
+  height: 400px;
   display: flex;
   justify-content: flex-start;
   align-items: stretch;
@@ -36,7 +36,7 @@ const ImgBoxContainer = styled.div`
 
 const ImgBox = styled.img`
   width: 30px;
-  height: 200px;
+  height: 100%;
   object-fit: fill;
 `
 
@@ -46,7 +46,7 @@ function App() {
   const [recorder, setRecorder] = useState(undefined);
   const recordingVideoRef = useRef();
   const playingVideoRef = useRef();
-  const canvasRef = useRef();
+  const preveiewCanvasRef = useRef();
 
   useWebcam({ setRecordedUrl, setRecorder, recordingVideoRef });
 
@@ -59,7 +59,7 @@ function App() {
 
   const {
     frames, images
-  } = useCanvas({ recordedUrl, playingVideoRef, canvasRef });
+  } = useCanvas({ recordedUrl, playingVideoRef });
 
   useEffect(() => {
     console.log('frames: ', frames);
@@ -79,16 +79,18 @@ function App() {
     <>
       <Video ref={recordingVideoRef} height="100%" />
       {recordedUrl && <Video ref={playingVideoRef} src={recordedUrl} autoPlay controls />}
-      {recordedUrl && <Canvas ref={canvasRef} />}
       <ButtonContainer>
         <Button onClick={isRecording ? undefined : handleStartClick}>Start</Button>
         <Button onClick={!recordedUrl ? undefined : handleResetClick}>Reset</Button>
         <Button onClick={!isRecording ? undefined : handleStopClick}>Stop</Button>
         <Button onClick={!recordedUrl ? undefined : handleExportFrames}>Export</Button>
       </ButtonContainer>
-      <ImgBoxContainer>
-        {_.map(images, (image, idx) => <ImgBox src={image} key={idx} alt="frame" />)}
-      </ImgBoxContainer>
+      {!_.isEmpty(images) && (
+        <ImgBoxContainer>
+          {_.map(images, (image, idx) => <ImgBox src={image} key={idx} alt="frame" draggable={false} />)}
+        </ImgBoxContainer>
+      )}
+      {!_.isEmpty(images) && <Canvas ref={preveiewCanvasRef} />}
     </>
   );
 }

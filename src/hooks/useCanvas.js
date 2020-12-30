@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 
-export const useCanvas = ({ recordedUrl, playingVideoRef, canvasRef }) => {
+export const useCanvas = ({ recordedUrl, playingVideoRef }) => {
   const [frames, setFrames] = useState([]);
   const [images, setImages] = useState([]);
   useEffect(() => {
     const playingVideo = playingVideoRef.current;
-    const canvas = canvasRef.current;
 
-    if (playingVideo && canvas && recordedUrl) {
-      const ctx = canvas.getContext('2d');
+    if (playingVideo && recordedUrl) {
       const tempCanvas = document.createElement('canvas');
       tempCanvas.setAttribute('width', 600);
       tempCanvas.setAttribute('height', 400);
@@ -26,7 +24,6 @@ export const useCanvas = ({ recordedUrl, playingVideoRef, canvasRef }) => {
         innerFrames.push(frame);
         const image = tempCanvas.toDataURL('jpg');
         innerImages.push(image);
-        ctx.putImageData(frame, 0, 0);
         setTimeout(computeFrame, 33);
       }
       playingVideo.addEventListener('play', computeFrame);
@@ -35,7 +32,7 @@ export const useCanvas = ({ recordedUrl, playingVideoRef, canvasRef }) => {
       setFrames([]);
       setImages([]);
     }
-  }, [canvasRef, playingVideoRef, recordedUrl])
+  }, [playingVideoRef, recordedUrl])
   return {
     frames, images
   };
