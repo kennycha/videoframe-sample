@@ -3,27 +3,28 @@ import { useEffect, useState } from "react";
 export const useCanvas = ({ recordedUrl, playingVideoRef, canvasRef }) => {
   const [frames, setFrames] = useState([]);
   useEffect(() => {
-    const video = playingVideoRef.current;
+    const playingVideo = playingVideoRef.current;
     const canvas = canvasRef.current;
 
-    if (video && canvas && recordedUrl) {
+    if (playingVideo && canvas && recordedUrl) {
       const ctx = canvas.getContext('2d');
       const tempCanvas = document.createElement('canvas');
       tempCanvas.setAttribute('width', 600);
       tempCanvas.setAttribute('height', 400);
       const tempCtx = tempCanvas.getContext('2d');
+      const innerFrames = [];
       const computeFrame = () => {
-        if (video.paused || video.ended) {
+        if (playingVideo.paused || playingVideo.ended) {
+          setFrames(innerFrames);
           return;
         }
-        tempCtx.drawImage(video, 0, 0, video.offsetWidth / 2, video.offsetHeight / 3);
-        const frame = tempCtx.getImageData(0, 0, video.offsetWidth / 2, video.offsetHeight / 3);
-        setFrames([...frames, frame])
+        tempCtx.drawImage(playingVideo, 0, 0, playingVideo.offsetWidth / 2, playingVideo.offsetHeight / 3);
+        const frame = tempCtx.getImageData(0, 0, playingVideo.offsetWidth / 2, playingVideo.offsetHeight / 3);
+        innerFrames.push(frame);
         ctx.putImageData(frame, 0, 0);
         setTimeout(computeFrame, 33);
       }
-
-      video.addEventListener('play', computeFrame);
+      playingVideo.addEventListener('play', computeFrame);
     }
     return () => {
       setFrames([]);

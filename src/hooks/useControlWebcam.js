@@ -6,7 +6,7 @@ const VIDEO_TYPE = 'webm';
 export const useControlWebcam = ({ recorder, recordedUrl, setRecordedUrl }) => {
   const [isRecording, setIsRecording] = useState(false);
 
-  const onStartClick = () => {
+  const handleStartClick = () => {
     if (!_.isEmpty(recordedUrl)) {
       setRecordedUrl(undefined);
     }
@@ -20,7 +20,7 @@ export const useControlWebcam = ({ recorder, recordedUrl, setRecordedUrl }) => {
     }
   };
 
-  const onResetClick = () => {
+  const handleResetClick = () => {
     if (recorder && recorder.state === 'recording') {
       recorder.stop();
     }
@@ -28,7 +28,7 @@ export const useControlWebcam = ({ recorder, recordedUrl, setRecordedUrl }) => {
     setRecordedUrl(undefined);
   };
 
-  const onStopClick = () => {
+  const handleStopClick = () => {
     if (recorder && recorder.state !== 'inactive') {
       recorder.stop();
       setIsRecording(false);
@@ -37,8 +37,8 @@ export const useControlWebcam = ({ recorder, recordedUrl, setRecordedUrl }) => {
 
   return {
     isRecording,
-    onStartClick,
-    onResetClick,
-    onStopClick,
+    handleStartClick,
+    handleResetClick,
+    handleStopClick,
   }
 }

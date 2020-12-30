@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { useWebcam } from "./hooks/useWebcam";
 import { useControlWebcam } from "./hooks/useControlWebcam";
@@ -16,12 +16,12 @@ const Canvas = styled.canvas`
 
 const ButtonContainer = styled.div`
   width: 100%;
-  height: 100px;
+  height: 50px;
 `
 
 const Button = styled.button`
-  height: 50px;
   width: 100px;
+  height: 50px;
 `
 
 const ImgBoxContainer = styled.div`
@@ -33,7 +33,7 @@ const ImgBoxContainer = styled.div`
   overflow-x: scroll;
 `
 
-const ImgBox = styled.div`
+const ImgBox = styled.canvas`
   width: 10px;
   height: 100%;
 `
@@ -49,22 +49,26 @@ function App() {
 
   const { 
     isRecording,
-    onStartClick,
-    onResetClick,
-    onStopClick, 
-  } = useControlWebcam({ recorder, recordedUrl, setRecordedUrl })
+    handleStartClick,
+    handleResetClick,
+    handleStopClick, 
+  } = useControlWebcam({ recorder, recordedUrl, setRecordedUrl });
 
-  const frames = useCanvas({ recordedUrl, playingVideoRef, canvasRef })
+  const frames = useCanvas({ recordedUrl, playingVideoRef, canvasRef });
 
-  const handleExportFrames = () => {
-    // console.log(frames);
-    const blob = new Blob([JSON.stringify(frames[0])], { type: 'text/json' });
+  useEffect(() => {
+    console.log('frames: ', frames);
+  }, [frames])
+
+  const handleExportFrames = useCallback(() => {
+    console.log(frames);
+    const blob = new Blob([JSON.stringify(frames)], { type: 'text/json' });
     const objURL = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.download = 'frames.json';
     a.href = objURL;
     a.click();
-  }
+  }, [frames]);
 
   return (
     <>
@@ -72,9 +76,9 @@ function App() {
       {recordedUrl && <Video ref={playingVideoRef} src={recordedUrl} autoPlay controls />}
       {recordedUrl && <Canvas ref={canvasRef} />}
       <ButtonContainer>
-        <Button onClick={isRecording ? undefined : onStartClick}>Start</Button>
-        <Button onClick={!recordedUrl ? undefined : onResetClick}>Reset</Button>
-        <Button onClick={!isRecording ? undefined : onStopClick}>Stop</Button>
+        <Button onClick={isRecording ? undefined : handleStartClick}>Start</Button>
+        <Button onClick={!recordedUrl ? undefined : handleResetClick}>Reset</Button>
+        <Button onClick={!isRecording ? undefined : handleStopClick}>Stop</Button>
         <Button onClick={!recordedUrl ? undefined : handleExportFrames}>Export</Button>
       </ButtonContainer>
       <ImgBoxContainer>
