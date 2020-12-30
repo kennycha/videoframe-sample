@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 export const useCanvas = ({ recordedUrl, playingVideoRef, canvasRef }) => {
   const [frames, setFrames] = useState([]);
+  const [images, setImages] = useState([]);
   useEffect(() => {
     const playingVideo = playingVideoRef.current;
     const canvas = canvasRef.current;
@@ -13,14 +14,18 @@ export const useCanvas = ({ recordedUrl, playingVideoRef, canvasRef }) => {
       tempCanvas.setAttribute('height', 400);
       const tempCtx = tempCanvas.getContext('2d');
       const innerFrames = [];
+      const innerImages = [];
       const computeFrame = () => {
         if (playingVideo.paused || playingVideo.ended) {
           setFrames(innerFrames);
+          setImages(innerImages);
           return;
         }
-        tempCtx.drawImage(playingVideo, 0, 0, playingVideo.offsetWidth / 2, playingVideo.offsetHeight / 3);
-        const frame = tempCtx.getImageData(0, 0, playingVideo.offsetWidth / 2, playingVideo.offsetHeight / 3);
+        tempCtx.drawImage(playingVideo, 0, 0, playingVideo.offsetWidth, playingVideo.offsetHeight);
+        const frame = tempCtx.getImageData(0, 0, playingVideo.offsetWidth, playingVideo.offsetHeight);
         innerFrames.push(frame);
+        const image = tempCanvas.toDataURL('jpg');
+        innerImages.push(image);
         ctx.putImageData(frame, 0, 0);
         setTimeout(computeFrame, 33);
       }
@@ -28,7 +33,10 @@ export const useCanvas = ({ recordedUrl, playingVideoRef, canvasRef }) => {
     }
     return () => {
       setFrames([]);
+      setImages([]);
     }
   }, [canvasRef, playingVideoRef, recordedUrl])
-  return frames;
+  return {
+    frames, images
+  };
 };

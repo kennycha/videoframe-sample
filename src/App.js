@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
+import _ from 'lodash';
 import { useWebcam } from "./hooks/useWebcam";
 import { useControlWebcam } from "./hooks/useControlWebcam";
 import { useCanvas } from "./hooks/useCanvas";
@@ -33,10 +34,12 @@ const ImgBoxContainer = styled.div`
   overflow-x: scroll;
 `
 
-const ImgBox = styled.canvas`
-  width: 10px;
-  height: 100%;
+const ImgBox = styled.img`
+  width: 30px;
+  height: 200px;
+  object-fit: fill;
 `
+
 
 function App() {
   const [recordedUrl, setRecordedUrl] = useState(undefined);
@@ -54,14 +57,16 @@ function App() {
     handleStopClick, 
   } = useControlWebcam({ recorder, recordedUrl, setRecordedUrl });
 
-  const frames = useCanvas({ recordedUrl, playingVideoRef, canvasRef });
+  const {
+    frames, images
+  } = useCanvas({ recordedUrl, playingVideoRef, canvasRef });
 
   useEffect(() => {
     console.log('frames: ', frames);
-  }, [frames])
+    console.log('images: ', images);
+  }, [frames, images])
 
   const handleExportFrames = useCallback(() => {
-    console.log(frames);
     const blob = new Blob([JSON.stringify(frames)], { type: 'text/json' });
     const objURL = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -82,8 +87,7 @@ function App() {
         <Button onClick={!recordedUrl ? undefined : handleExportFrames}>Export</Button>
       </ButtonContainer>
       <ImgBoxContainer>
-        <ImgBox />
-        <ImgBox />
+        {_.map(images, (image, idx) => <ImgBox src={image} key={idx} alt="frame" />)}
       </ImgBoxContainer>
     </>
   );
