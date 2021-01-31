@@ -22,7 +22,7 @@ const Button = styled.button`
 
 const ImgBoxContainer = styled.div`
   width: 100%;
-  height: 200px;
+  height: 100%;
   display: flex;
   justify-content: flex-start;
   align-items: stretch;
@@ -97,6 +97,7 @@ function App() {
   
   const handleExportFrames = useCallback(() => {
     const slicedFrames = (startIdx && endIdx) ? frames.slice(startIdx, endIdx + 1) : frames;
+    console.log('framse: ', frames);
     console.log('slicedFrames: ', slicedFrames);
     const blob = new Blob([JSON.stringify(slicedFrames)], { type: 'text/json' });
     const objURL = window.URL.createObjectURL(blob);
