@@ -16,7 +16,7 @@ export const useCanvas = ({ recordedUrl, playingVideoRef }) => {
       const innerImages = [];
 
       let currentTime = 0;
-      const getFrames = () => {
+      const getFrames =  async() => {
         if (playingVideo.ended || (currentTime > playingVideo.duration) || (playingVideo.duration - currentTime) < 1 / 30) {
           console.log('innerFrames.length: ', innerFrames.length)
           console.log('innerImages.length: ', innerImages.length)
@@ -25,7 +25,9 @@ export const useCanvas = ({ recordedUrl, playingVideoRef }) => {
           currentTime = 0;
           return;
         }
+        await playingVideo.play();
         playingVideo.currentTime = currentTime;
+        await playingVideo.pause();
         tempCtx.drawImage(playingVideo, 0, 0, playingVideo.offsetWidth, playingVideo.offsetHeight);
         const frame = tempCtx.getImageData(0, 0, playingVideo.offsetWidth, playingVideo.offsetHeight);
         innerFrames.push(frame);
@@ -50,7 +52,7 @@ export const useCanvas = ({ recordedUrl, playingVideoRef }) => {
           }
         }
       });
-      playingVideo.addEventListener('play', getFrames);
+      playingVideo.addEventListener('loadeddata', getFrames);
       // 녹화한 영상 데이터 로드 후 타임라인에 그릴 때까지 걸리는 시간은 loadstart / ended 로 핸들
       // playingVideo.addEventListener('loadstart', () => console.log('loadstart'));
       // playingVideo.addEventListener('ended', () => console.log('loadend'));
